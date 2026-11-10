@@ -192,8 +192,8 @@ export const InterviewApp: React.FC = () => {
         />
 
         {/* Footer Interaction Dock */}
-        <section className="border-t border-border/70 bg-card/70 backdrop-blur-md p-4 sm:p-6 space-y-4">
-          <div className="max-w-2xl mx-auto space-y-4">
+        <section className="border-t border-border/60 bg-card/60 backdrop-blur-xl p-4 sm:p-5 space-y-3.5 shadow-lg">
+          <div className="max-w-2xl mx-auto space-y-3.5">
             {/* Suggested Starter Questions */}
             {messages.length < 3 && (
               <SuggestedQuestions
