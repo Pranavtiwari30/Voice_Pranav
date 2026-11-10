@@ -11,6 +11,7 @@ interface UseSpeechRecognitionReturn {
   isListening: boolean;
   interimTranscript: string;
   isSupported: boolean;
+  hasCheckedSupport: boolean;
   permissionError: string | null;
   startListening: () => void;
   stopListening: () => void;
@@ -24,6 +25,7 @@ export function useSpeechRecognition({
   const [isListening, setIsListening] = useState(false);
   const [interimTranscript, setInterimTranscript] = useState('');
   const [isSupported, setIsSupported] = useState(false);
+  const [hasCheckedSupport, setHasCheckedSupport] = useState(false);
   const [permissionError, setPermissionError] = useState<string | null>(null);
 
   const recognitionRef = useRef<any>(null);
@@ -36,6 +38,7 @@ export function useSpeechRecognition({
     if (typeof window !== 'undefined') {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       setIsSupported(Boolean(SpeechRecognition));
+      setHasCheckedSupport(true);
     }
   }, []);
 

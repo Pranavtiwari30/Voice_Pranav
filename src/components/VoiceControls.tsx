@@ -13,6 +13,7 @@ interface VoiceControlsProps {
   isListening: boolean;
   isSpeaking: boolean;
   isSupported: boolean;
+  hasCheckedSupport?: boolean;
   interimTranscript: string;
   hasContentToReplay: boolean;
   permissionError: string | null;
@@ -26,6 +27,7 @@ export const VoiceControls: React.FC<VoiceControlsProps> = ({
   isListening,
   isSpeaking,
   isSupported,
+  hasCheckedSupport = false,
   interimTranscript,
   hasContentToReplay,
   permissionError,
@@ -46,7 +48,7 @@ export const VoiceControls: React.FC<VoiceControlsProps> = ({
         </Alert>
       )}
 
-      {!isSupported && !permissionError && (
+      {!isSupported && hasCheckedSupport && !permissionError && (
         <Alert className="w-full max-w-xl rounded-xl border-border bg-card">
           <AlertCircle className="size-4 text-primary" />
           <AlertTitle className="text-xs font-semibold">Voice Input Notice</AlertTitle>

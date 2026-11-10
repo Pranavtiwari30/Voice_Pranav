@@ -111,6 +111,7 @@ export const InterviewApp: React.FC = () => {
     isListening,
     interimTranscript,
     isSupported: isSttSupported,
+    hasCheckedSupport,
     permissionError,
     startListening,
     stopListening,
@@ -207,6 +208,7 @@ export const InterviewApp: React.FC = () => {
               isListening={isListening}
               isSpeaking={isSpeaking}
               isSupported={isSttSupported}
+              hasCheckedSupport={hasCheckedSupport}
               interimTranscript={interimTranscript}
               hasContentToReplay={hasContentToReplay}
               permissionError={permissionError}

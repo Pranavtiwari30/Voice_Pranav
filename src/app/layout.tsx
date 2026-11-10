@@ -29,8 +29,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={cn("dark", "font-sans", manrope.variable)}>
-      <body className="bg-background text-foreground min-h-screen antialiased selection:bg-primary selection:text-primary-foreground">
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={cn("dark", "font-sans", manrope.variable)}
+    >
+      <body
+        suppressHydrationWarning
+        className="bg-background text-foreground min-h-screen antialiased selection:bg-primary selection:text-primary-foreground"
+      >
         <TooltipProvider>{children}</TooltipProvider>
       </body>
     </html>
