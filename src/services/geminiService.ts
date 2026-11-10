@@ -58,8 +58,6 @@ function cleanSpokenText(text: string): string {
     .trim();
 }
 
-const FALLBACK_MODELS = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
-
 async function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -81,13 +79,7 @@ function isRetryableError(error: any): boolean {
 
 export async function generateInterviewResponse(options: GenerateOptions): Promise<string> {
   const ai = getClient();
-  const configuredModel = process.env.GEMINI_MODEL?.trim() || 'gemini-2.5-flash';
-
-  // Build candidate model list (primary model first, then fallbacks without duplicates)
-  const candidateModels = [
-    configuredModel,
-    ...FALLBACK_MODELS.filter((m) => m !== configuredModel),
-  ];
+  const modelName = process.env.GEMINI_MODEL?.trim() || 'gemini-3.8-flash';
 
   const { message, history = [], systemInstruction } = options;
 
@@ -103,63 +95,59 @@ export async function generateInterviewResponse(options: GenerateOptions): Promi
   ];
 
   let lastError: any = null;
+  const maxAttempts = 4;
 
-  // Try candidate models in order if one experiences high demand (503)
-  for (const modelName of candidateModels) {
-    const maxAttempts = 3;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      const response = await ai.models.generateContent({
+        model: modelName,
+        contents,
+        config: {
+          systemInstruction,
+          temperature: 0.7,
+          maxOutputTokens: 600,
+        },
+      });
 
-    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-      try {
-        const response = await ai.models.generateContent({
-          model: modelName,
-          contents,
-          config: {
-            systemInstruction,
-            temperature: 0.7,
-            maxOutputTokens: 600,
-          },
-        });
-
-        const rawText = response.text || '';
-        if (!rawText.trim()) {
-          throw new GeminiServiceError(
-            'Gemini returned an empty response. Please try asking again.',
-            'PROVIDER_ERROR'
-          );
-        }
-
-        return cleanSpokenText(rawText);
-      } catch (error: any) {
-        lastError = error;
-        if (error instanceof GeminiServiceError) {
-          throw error;
-        }
-
-        const isRetryable = isRetryableError(error);
-        console.warn(
-          `[GeminiService] Model ${modelName} attempt ${attempt}/${maxAttempts} failed:`,
-          error?.message || error
+      const rawText = response.text || '';
+      if (!rawText.trim()) {
+        throw new GeminiServiceError(
+          'Gemini returned an empty response. Please try asking again.',
+          'PROVIDER_ERROR'
         );
-
-        if (isRetryable && attempt < maxAttempts) {
-          // Exponential backoff: 800ms, 1600ms
-          await delay(800 * attempt);
-          continue;
-        }
-
-        // If not retryable or max attempts exhausted, break to try the next fallback model
-        break;
       }
+
+      return cleanSpokenText(rawText);
+    } catch (error: any) {
+      lastError = error;
+      if (error instanceof GeminiServiceError) {
+        throw error;
+      }
+
+      const isRetryable = isRetryableError(error);
+      console.warn(
+        `[GeminiService] Model ${modelName} attempt ${attempt}/${maxAttempts} failed:`,
+        error?.message || error
+      );
+
+      if (isRetryable && attempt < maxAttempts) {
+        // Exponential backoff: 1000ms, 2000ms, 3000ms
+        await delay(1000 * attempt);
+        continue;
+      }
+
+      // If error is not retryable, stop retrying immediately
+      break;
     }
   }
 
-  // If all models and retries failed, parse the final error
+  // If retries failed, parse the final error
   const finalErrorMsg = lastError?.message || String(lastError);
-  console.error('[GeminiService] All model attempts failed:', finalErrorMsg);
+  console.error('[GeminiService] Generation failed:', finalErrorMsg);
 
   if (isRetryableError(lastError)) {
     throw new GeminiServiceError(
-      'Gemini is currently experiencing high demand. Please try again in a few moments.',
+      'The AI service is currently experiencing high demand. Please wait a few seconds and try again.',
       'RATE_LIMIT'
     );
   }
