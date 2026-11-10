@@ -1,5 +1,11 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
+import { Manrope } from "next/font/google";
+import { cn } from "@/lib/utils";
+
+import { TooltipProvider } from "@/components/ui/tooltip";
+
+const manrope = Manrope({subsets:['latin'],variable:'--font-sans'});
 
 export const metadata: Metadata = {
   title: 'Pranav Tiwari — Voice Interview Assistant',
@@ -23,9 +29,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
-      <body className="bg-slate-950 text-slate-100 min-h-screen antialiased selection:bg-blue-600 selection:text-white">
-        {children}
+    <html lang="en" className={cn("dark", "font-sans", manrope.variable)}>
+      <body className="bg-background text-foreground min-h-screen antialiased selection:bg-primary selection:text-primary-foreground">
+        <TooltipProvider>{children}</TooltipProvider>
       </body>
     </html>
   );

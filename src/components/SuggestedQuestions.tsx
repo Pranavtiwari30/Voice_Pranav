@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Sparkles } from 'lucide-react';
+import { Suggestions, Suggestion } from '@/components/ai-elements/suggestion';
 
 interface SuggestedQuestionsProps {
   onSelectQuestion: (question: string) => void;
@@ -21,28 +22,29 @@ export const SuggestedQuestions: React.FC<SuggestedQuestionsProps> = ({
   disabled = false,
 }) => {
   return (
-    <div className="py-2">
-      <div className="flex items-center gap-1.5 mb-2.5 px-1">
-        <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-        <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+    <div className="py-1">
+      <div className="flex items-center gap-1.5 mb-2 px-1">
+        <Sparkles className="w-3.5 h-3.5 text-primary" />
+        <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
           Suggested Topics
         </span>
       </div>
-      <div className="flex flex-wrap gap-2">
+      <Suggestions className="pb-1">
         {QUESTIONS.map((question, idx) => (
-          <button
+          <Suggestion
             key={idx}
-            onClick={() => onSelectQuestion(question)}
+            suggestion={question}
+            onClick={onSelectQuestion}
             disabled={disabled}
-            className="text-left text-xs sm:text-sm px-3.5 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 active:scale-[0.98] border border-slate-700/60 hover:border-blue-500/40 text-slate-200 transition-all shadow-sm hover:shadow-md disabled:opacity-50 disabled:pointer-events-none group"
+            variant="outline"
+            className="text-xs font-normal border-border/80 bg-card/60 hover:bg-accent hover:text-accent-foreground transition-all cursor-pointer"
           >
-            <span className="text-blue-400 group-hover:text-blue-300 mr-1.5">“</span>
+            <span className="text-primary font-semibold mr-1.5">“</span>
             {question}
-            <span className="text-blue-400 group-hover:text-blue-300 ml-1">”</span>
-          </button>
+            <span className="text-primary font-semibold ml-1">”</span>
+          </Suggestion>
         ))}
-      </div>
+      </Suggestions>
     </div>
   );
 };
-

@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
-import { Send, CornerDownLeft } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Send } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface TextComposerProps {
   onSendMessage: (message: string) => void;
@@ -47,18 +48,17 @@ export const TextComposer: React.FC<TextComposerProps> = ({
         disabled={disabled}
         placeholder={placeholder}
         maxLength={1000}
-        className="w-full pl-4 pr-12 py-3.5 bg-slate-800/90 hover:bg-slate-800 focus:bg-slate-850 text-slate-100 placeholder-slate-400 rounded-2xl border border-slate-700/70 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all text-sm shadow-inner disabled:opacity-50"
+        className="w-full pl-4 pr-12 py-3 bg-card/80 hover:bg-card focus:bg-card text-foreground placeholder:text-muted-foreground rounded-2xl border border-border/80 focus:border-primary focus:ring-1 focus:ring-ring focus:outline-none transition-all text-sm shadow-xs disabled:opacity-50"
       />
-      <button
+      <Button
         type="submit"
+        size="icon-sm"
         disabled={disabled || !input.trim()}
-        className="absolute right-2 p-2 rounded-xl bg-blue-600 hover:bg-blue-500 active:scale-95 text-white disabled:opacity-30 disabled:pointer-events-none transition-all shadow-sm"
-        title="Send question"
+        className="absolute right-2 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer"
         aria-label="Send question"
       >
-        <Send className="w-4 h-4" />
-      </button>
+        <Send className="size-3.5" />
+      </Button>
     </form>
   );
 };
-

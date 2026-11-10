@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { VoiceState } from '@/types/chat';
+import { Badge } from '@/components/ui/badge';
 
 interface StatusIndicatorProps {
   state: VoiceState;
@@ -15,28 +16,32 @@ export const StatusIndicator: React.FC<StatusIndicatorProps> = ({ state }) => {
           dotColor: 'bg-amber-400',
           pulseColor: 'bg-amber-400/40',
           label: 'Listening',
-          textColor: 'text-amber-300',
+          badgeVariant: 'outline' as const,
+          className: 'border-amber-500/40 text-amber-400 bg-amber-500/10',
         };
       case 'processing':
         return {
           dotColor: 'bg-indigo-400',
           pulseColor: 'bg-indigo-400/40',
           label: 'Thinking...',
-          textColor: 'text-indigo-300',
+          badgeVariant: 'outline' as const,
+          className: 'border-indigo-500/40 text-indigo-400 bg-indigo-500/10',
         };
       case 'speaking':
         return {
           dotColor: 'bg-emerald-400',
           pulseColor: 'bg-emerald-400/40',
           label: 'Speaking',
-          textColor: 'text-emerald-300',
+          badgeVariant: 'outline' as const,
+          className: 'border-emerald-500/40 text-emerald-400 bg-emerald-500/10',
         };
       case 'error':
         return {
-          dotColor: 'bg-rose-500',
-          pulseColor: 'bg-rose-500/40',
+          dotColor: 'bg-destructive',
+          pulseColor: 'bg-destructive/40',
           label: 'Error',
-          textColor: 'text-rose-300',
+          badgeVariant: 'destructive' as const,
+          className: '',
         };
       case 'idle':
       default:
@@ -44,21 +49,24 @@ export const StatusIndicator: React.FC<StatusIndicatorProps> = ({ state }) => {
           dotColor: 'bg-emerald-500',
           pulseColor: 'bg-emerald-500/30',
           label: 'Ready',
-          textColor: 'text-slate-300',
+          badgeVariant: 'outline' as const,
+          className: 'border-border/60 text-muted-foreground bg-muted/30',
         };
     }
   };
 
-  const { dotColor, pulseColor, label, textColor } = getStatusConfig();
+  const { dotColor, pulseColor, label, badgeVariant, className } = getStatusConfig();
 
   return (
-    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700/60 shadow-sm backdrop-blur-sm">
-      <span className="relative flex h-2.5 w-2.5">
+    <Badge
+      variant={badgeVariant}
+      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium tracking-wide ${className}`}
+    >
+      <span className="relative flex h-2 w-2">
         <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${pulseColor}`} />
-        <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${dotColor}`} />
+        <span className={`relative inline-flex rounded-full h-2 w-2 ${dotColor}`} />
       </span>
-      <span className={`text-xs font-medium tracking-wide ${textColor}`}>{label}</span>
-    </div>
+      <span>{label}</span>
+    </Badge>
   );
 };
-

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback, useRef } from 'react';
-import { ChatMessage, VoiceState, Role } from '@/types/chat';
+import { ChatMessage, VoiceState } from '@/types/chat';
 import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
 import { useSpeechSynthesis } from '@/hooks/useSpeechSynthesis';
 import { ConversationHeader } from './ConversationHeader';
@@ -9,6 +9,7 @@ import { ConversationPanel } from './ConversationPanel';
 import { VoiceControls } from './VoiceControls';
 import { TextComposer } from './TextComposer';
 import { SuggestedQuestions } from './SuggestedQuestions';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle, X } from 'lucide-react';
 
 export const InterviewApp: React.FC = () => {
@@ -23,7 +24,6 @@ export const InterviewApp: React.FC = () => {
   // Speech Synthesis hook
   const {
     isSpeaking,
-    isSupported: isTtsSupported,
     speak,
     stopSpeaking: ttsStopSpeaking,
     replay,
@@ -148,7 +148,7 @@ export const InterviewApp: React.FC = () => {
   }, [isListening, stopListening, stopSpeaking]);
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-blue-500/30">
+    <div className="flex flex-col min-h-screen bg-background text-foreground font-sans selection:bg-primary/20">
       {/* Header */}
       <ConversationHeader
         state={state}
@@ -159,19 +159,22 @@ export const InterviewApp: React.FC = () => {
       {/* Error Notification Banner */}
       {errorMessage && (
         <div className="mx-4 mt-3 max-w-3xl self-center w-full">
-          <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-200 text-sm flex items-start justify-between gap-3 shadow-md">
-            <div className="flex items-start gap-2.5">
-              <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
-              <p className="leading-snug">{errorMessage}</p>
+          <Alert variant="destructive" className="rounded-xl flex items-start justify-between">
+            <div className="flex items-start gap-2">
+              <AlertCircle className="size-4 shrink-0 mt-0.5" />
+              <div>
+                <AlertTitle className="text-xs font-semibold">Error</AlertTitle>
+                <AlertDescription className="text-xs mt-0.5">{errorMessage}</AlertDescription>
+              </div>
             </div>
             <button
               onClick={() => setErrorMessage(null)}
-              className="p-1 rounded hover:bg-rose-500/20 text-rose-300 hover:text-white transition-colors"
+              className="p-1 rounded hover:bg-destructive/20 text-destructive-foreground transition-colors cursor-pointer"
               aria-label="Dismiss error"
             >
-              <X className="w-4 h-4" />
+              <X className="size-3.5" />
             </button>
-          </div>
+          </Alert>
         </div>
       )}
 
@@ -188,7 +191,7 @@ export const InterviewApp: React.FC = () => {
         />
 
         {/* Footer Interaction Dock */}
-        <section className="border-t border-slate-800/80 bg-slate-900/90 backdrop-blur-md p-4 sm:p-6 space-y-4">
+        <section className="border-t border-border/70 bg-card/70 backdrop-blur-md p-4 sm:p-6 space-y-4">
           <div className="max-w-2xl mx-auto space-y-4">
             {/* Suggested Starter Questions */}
             {messages.length < 3 && (
@@ -226,4 +229,3 @@ export const InterviewApp: React.FC = () => {
     </div>
   );
 };
-

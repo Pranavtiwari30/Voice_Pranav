@@ -2,14 +2,6 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 
-// Type declarations for Web Speech API
-declare global {
-  interface Window {
-    SpeechRecognition: any;
-    webkitSpeechRecognition: any;
-  }
-}
-
 interface UseSpeechRecognitionProps {
   onTranscriptReady: (transcript: string) => void;
   onError?: (errorMessage: string) => void;
@@ -105,7 +97,7 @@ export function useSpeechRecognition({
       recognition.continuous = true;
       recognition.interimResults = true;
       recognition.lang = 'en-US';
-      recognition.maxAlternatives = 1;
+      (recognition as any).maxAlternatives = 1;
 
       recognition.onstart = () => {
         setIsListening(true);
