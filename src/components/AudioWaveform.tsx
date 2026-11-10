@@ -26,3 +26,4 @@ export const AudioWaveform: React.FC<AudioWaveformProps> = ({ state }) => {
     </div>
   );
 };
+

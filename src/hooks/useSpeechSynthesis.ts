@@ -158,3 +158,4 @@ export function useSpeechSynthesis(onEndCallback?: () => void): UseSpeechSynthes
     selectedVoiceName,
   };
 }
+

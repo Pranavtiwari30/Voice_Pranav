@@ -226,3 +226,4 @@ export const InterviewApp: React.FC = () => {
     </div>
   );
 };
+

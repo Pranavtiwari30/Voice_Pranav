@@ -31,3 +31,4 @@ export interface ChatErrorResponse {
 }
 
 export type VoiceState = 'idle' | 'listening' | 'processing' | 'speaking' | 'error';
+

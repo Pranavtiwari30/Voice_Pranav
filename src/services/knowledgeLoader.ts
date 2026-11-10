@@ -53,3 +53,4 @@ export function loadKnowledge(): KnowledgeBase {
     throw error;
   }
 }
+

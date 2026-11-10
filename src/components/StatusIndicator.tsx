@@ -61,3 +61,4 @@ export const StatusIndicator: React.FC<StatusIndicatorProps> = ({ state }) => {
     </div>
   );
 };
+

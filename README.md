@@ -186,3 +186,4 @@ npx vercel --prod
 - `next.config.mjs` configures `outputFileTracingIncludes` so serverless functions retain access to markdown knowledge files in Vercel.
 - Request rate-limiting protects against quota exhaustion.
 - Comprehensive input sanitization prevents injection and malicious payloads.
+
