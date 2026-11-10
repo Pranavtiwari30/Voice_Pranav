@@ -211,6 +211,7 @@ export function useSpeechRecognition({
     isListening,
     interimTranscript,
     isSupported,
+    hasCheckedSupport,
     permissionError,
     startListening,
     stopListening,

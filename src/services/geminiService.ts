@@ -58,6 +58,13 @@ function cleanSpokenText(text: string): string {
     .trim();
 }
 
+const COMPATIBLE_MODELS = [
+  'gemini-flash-latest',
+  'gemini-3.5-flash-lite',
+  'gemini-3.5-flash',
+  'gemini-3.8-flash',
+];
+
 async function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -79,7 +86,13 @@ function isRetryableError(error: any): boolean {
 
 export async function generateInterviewResponse(options: GenerateOptions): Promise<string> {
   const ai = getClient();
-  const modelName = process.env.GEMINI_MODEL?.trim() || 'gemini-3.8-flash';
+  const primaryModel = process.env.GEMINI_MODEL?.trim() || 'gemini-3.8-flash';
+
+  // Try primary model first, followed by compatible 3.x models
+  const candidateModels = [
+    primaryModel,
+    ...COMPATIBLE_MODELS.filter((m) => m !== primaryModel),
+  ];
 
   const { message, history = [], systemInstruction } = options;
 
@@ -95,59 +108,61 @@ export async function generateInterviewResponse(options: GenerateOptions): Promi
   ];
 
   let lastError: any = null;
-  const maxAttempts = 4;
 
-  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-    try {
-      const response = await ai.models.generateContent({
-        model: modelName,
-        contents,
-        config: {
-          systemInstruction,
-          temperature: 0.7,
-          maxOutputTokens: 600,
-        },
-      });
+  for (const model of candidateModels) {
+    // Try each model up to 2 times
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      try {
+        const response = await ai.models.generateContent({
+          model,
+          contents,
+          config: {
+            systemInstruction,
+            temperature: 0.7,
+            maxOutputTokens: 600,
+          },
+        });
 
-      const rawText = response.text || '';
-      if (!rawText.trim()) {
-        throw new GeminiServiceError(
-          'Gemini returned an empty response. Please try asking again.',
-          'PROVIDER_ERROR'
+        const rawText = response.text || '';
+        if (!rawText.trim()) {
+          throw new GeminiServiceError(
+            'Gemini returned an empty response. Please try asking again.',
+            'PROVIDER_ERROR'
+          );
+        }
+
+        return cleanSpokenText(rawText);
+      } catch (error: any) {
+        lastError = error;
+        if (error instanceof GeminiServiceError) {
+          throw error;
+        }
+
+        const isRetryable = isRetryableError(error);
+        console.warn(
+          `[GeminiService] Model ${model} (attempt ${attempt}) failed:`,
+          error?.message || error
         );
+
+        if (isRetryable && attempt === 1) {
+          // Quick 600ms pause before retrying the same model once
+          await delay(600);
+          continue;
+        }
+
+        // If still failing with 503 / high demand or unrecoverable, move to the next candidate model
+        break;
       }
-
-      return cleanSpokenText(rawText);
-    } catch (error: any) {
-      lastError = error;
-      if (error instanceof GeminiServiceError) {
-        throw error;
-      }
-
-      const isRetryable = isRetryableError(error);
-      console.warn(
-        `[GeminiService] Model ${modelName} attempt ${attempt}/${maxAttempts} failed:`,
-        error?.message || error
-      );
-
-      if (isRetryable && attempt < maxAttempts) {
-        // Exponential backoff: 1000ms, 2000ms, 3000ms
-        await delay(1000 * attempt);
-        continue;
-      }
-
-      // If error is not retryable, stop retrying immediately
-      break;
     }
   }
 
-  // If retries failed, parse the final error
+  // If all candidate models failed
   const finalErrorMsg = lastError?.message || String(lastError);
-  console.error('[GeminiService] Generation failed:', finalErrorMsg);
+  console.error('[GeminiService] All candidate models failed:', finalErrorMsg);
 
   if (isRetryableError(lastError)) {
     throw new GeminiServiceError(
-      'The AI service is currently experiencing high demand. Please wait a few seconds and try again.',
+      'The AI service is currently experiencing high demand across model clusters. Please wait a few seconds and try again.',
       'RATE_LIMIT'
     );
   }
