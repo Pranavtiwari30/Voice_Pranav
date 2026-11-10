@@ -78,7 +78,10 @@ The assistant is grounded in real experience and facts from `personality.md` and
 |---|---|
 | **Framework** | Next.js 15 (App Router, Serverless Node.js runtime) |
 | **Language** | TypeScript (Strict mode) |
-| **Styling** | Tailwind CSS (Dark theme, responsive, custom animations) |
+| **Styling** | Tailwind CSS + OKLCH CSS Variables (Preset buFz184) |
+| **Typography** | Manrope (`next/font/google`) |
+| **UI Components** | shadcn/ui (Base UI primitives) |
+| **AI Components** | Vercel AI Elements (`Conversation`, `Message`, `Suggestions`, `Shimmer`) |
 | **AI Model** | Google Gemini 3.8 Flash (`gemini-3.8-flash`) |
 | **AI SDK** | `@google/genai` (Official Google Gen AI SDK) |
 | **Speech-to-Text** | Browser Web Speech API (`SpeechRecognition`) |
